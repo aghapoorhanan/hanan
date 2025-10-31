@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>شارژ حساب کاربری - HANAN</title>
+  <meta name="description" content="شارژ کیف پول و افزایش اعتبار اکانت کاربران سایت HANAN.">
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>body{font-family:Vazirmatn,sans-serif;}</style>
+</head>
+<body class="bg-blue-50 min-h-screen text-gray-800">
+  <header class="bg-white/90 shadow sticky top-0 z-30 py-4">
+    <div class="max-w-6xl mx-auto flex justify-between items-center px-4">
+      <div class="font-extrabold text-lg text-blue-600">HANAN</div>
+      <nav class="flex gap-7 text-base">
+        <a href="index.html">خانه</a>
+        <a href="wallet.html" class="active font-bold">شارژ حساب</a>
+        <a href="login.html">ورود</a>
+      </nav>
+    </div>
+  </header>
+  <main class="mt-14 flex flex-col items-center px-4 min-h-[70vh]">
+    <section class="bg-white/90 rounded-2xl shadow-lg px-9 py-10 max-w-md w-full flex flex-col gap-8 items-center">
+      <h1 class="text-2xl font-extrabold text-blue-700 mb-2">کیف پول حساب کاربری</h1>
+      <div id="balanceBox" class="text-xl text-gray-600 mb-3">اعتبار فعلی شما: <span id="walletAmount">0</span> تومان</div>
+      <form class="flex flex-col gap-4 w-full" id="chargeForm">
+        <input type="number" min="10000" placeholder="مبلغ شارژ به تومان (حداقل ۱۰ هزار)" name="amount" required class="px-3 py-2 rounded border border-gray-200 bg-slate-50 focus:ring-2 ring-blue-400">
+        <button type="submit" class="bg-gradient-to-l from-orange-400 to-yellow-400 px-5 py-2 rounded-xl text-white font-extrabold text-lg shadow hover:scale-105 transition">رفتن به درگاه پرداخت</button>
+      </form>
+      <div id="successCharge" class="hidden text-green-700 font-bold mt-4">شارژ حساب با موفقیت انجام شد!</div>
+    </section>
+  </main>
+  <footer class="border-t bg-white/70 py-5 mt-10 text-center text-gray-500 font-medium text-sm">&copy; 2025 HANAN Agency</footer>
+  <script>
+    // شبیه‌سازی اعتبار کاربر در لوکال استوریج
+    const balanceBox = document.getElementById('walletAmount');
+    let balance = localStorage.getItem('walletAmount') || '0';
+    balanceBox.innerText = parseInt(balance).toLocaleString();
+    document.getElementById('chargeForm').onsubmit = function(e){
+      e.preventDefault();
+      let input = this.elements['amount'];
+      let _amount = parseInt(input.value) || 0;
+      if(_amount < 10000) return;
+      // به صفحه پرداخت برو با مبلغ واردشده
+      window.location.href = 'pay.html?amount=' + _amount + '&for=wallet';
+    }
+  </script>
+</body>
+</html>

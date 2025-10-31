@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ارتباط با ما - HANAN</title>
+  <meta name="description" content="ارتباط و مشاوره رایگان با آژانس تبلیغاتی HANAN. درخواست همکاری، مشاوره و ارسال پیام به تیم ما."/>
+  <meta name="keywords" content="تماس با HANAN, ارتباط تبلیغات, فرم مشاوره"/>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>body{font-family:Vazirmatn,sans-serif;}</style>
+</head>
+<body class="bg-slate-50 min-h-screen text-gray-900">
+  <header class="bg-white/90 shadow sticky top-0 z-30 py-4">
+    <div class="max-w-6xl mx-auto flex justify-between items-center px-4">
+      <div class="font-extrabold text-lg text-blue-600">HANAN</div>
+      <nav class="flex gap-7 text-base">
+        <a href="index.html">خانه</a>
+        <a href="services.html">خدمات</a>
+        <a href="packages.html">پکیج‌ها</a>
+        <a href="portfolio.html">نمونه‌کار</a>
+        <a href="blog.html">وبلاگ</a>
+        <a href="contact.html" class="active bg-gradient-to-l from-orange-400 to-yellow-400 px-3 py-2 rounded-md text-white font-bold shadow hover:scale-105 transition">ارتباط</a>
+      </nav>
+    </div>
+  </header>
+  <main class="mt-10 min-h-[60vh] flex flex-col items-center justify-center px-4">
+    <section class="bg-white/90 rounded-xl shadow-lg p-7 w-full max-w-xl mx-auto flex flex-col gap-7">
+      <h1 class="text-2xl md:text-3xl font-bold text-blue-700">فرم ارتباط و مشاوره رایگان</h1>
+      <form class="flex flex-col gap-4 mt-3" method="post" action="https://formspree.io/f/xnqklwpk" target="_blank">
+        <input type="text" name="name" placeholder="نام و نام خانوادگی" required class="px-3 py-2 rounded border border-gray-200 bg-slate-50 focus:ring-2 ring-blue-400">
+        <input type="email" name="email" placeholder="ایمیل شما" required class="px-3 py-2 rounded border border-gray-200 bg-slate-50 focus:ring-2 ring-blue-400">
+        <input type="tel" name="phone" placeholder="شماره تماس" required class="px-3 py-2 rounded border border-gray-200 bg-slate-50 focus:ring-2 ring-blue-400">
+        <textarea name="desc" placeholder="توضیح پروژه یا سوال شما" rows="4" class="px-3 py-2 rounded border border-gray-200 bg-slate-50 focus:ring-2 ring-blue-400"></textarea>
+        <button type="submit" class="bg-gradient-to-l from-orange-400 to-yellow-400 px-5 py-2 rounded-xl text-white font-extrabold text-lg shadow hover:scale-105 transition">درخواست مشاوره رایگان</button>
+      </form>
+      <div class="text-sm text-center mt-6 opacity-70">
+        <a href="https://app.hubspot.com/contacts/" target="_blank" class="text-blue-600 underline">ورود به CRM و مشاهده سرنخ‌ها</a>
+      </div>
+    </section>
+  </main>
+  <footer class="border-t bg-white/70 py-5 mt-10 text-center text-gray-500 font-medium text-sm">
+    &copy; 2025 HANAN Agency
+  </footer>
+  <script src="app.js"></script>
+</body>
+</html>

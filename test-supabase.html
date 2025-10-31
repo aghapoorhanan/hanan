@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تست Supabase - کانون تبلیغاتی حنان</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <div class="form-container">
+        <div class="form-card">
+            <h2 class="form-title">تست اتصال Supabase</h2>
+            
+            <div id="connectionStatus" class="loading-text">در حال بررسی اتصال...</div>
+            <div id="testResults"></div>
+            
+            <button onclick="testConnection()" class="btn-primary">تست اتصال</button>
+            <button onclick="testSignUp()" class="btn-secondary">تست ثبت‌نام</button>
+            <button onclick="testSignIn()" class="btn-secondary">تست ورود</button>
+            
+            <div style="margin-top: 2rem;">
+                <h3>اطلاعات تست:</h3>
+                <p><strong>ایمیل تست:</strong> test@example.com</p>
+                <p><strong>رمز عبور:</strong> 12345678</p>
+                <p><strong>شماره موبایل:</strong> 09123456789</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Supabase configuration
+        const supabaseUrl = "https://gqalshbyurbfbfxfcpas.supabase.co";
+        const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxYWxzaGJ5dXJiZmJmeGZjcGFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc3ODQyNjAsImV4cCI6MjA3MzM2MDI2MH0.1NZatlMNKMS6eqSph2aS7-MRsKJHZTHLGOF3BGTpGxE";
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        const connectionStatus = document.getElementById('connectionStatus');
+        const testResults = document.getElementById('testResults');
+
+        async function testConnection() {
+            connectionStatus.textContent = 'در حال تست اتصال...';
+            testResults.innerHTML = '';
+
+            try {
+                // Test basic connection
+                const { data, error } = await supabase.from('_supabase_migrations').select('*').limit(1);
+                
+                if (error) {
+                    console.log('Migration table error (expected):', error);
+                }
+
+                // Test auth connection
+                const { data: { user }, error: authError } = await supabase.auth.getUser();
+                
+                connectionStatus.textContent = 'اتصال موفق!';
+                connectionStatus.style.color = 'green';
+                
+                testResults.innerHTML = `
+                    <div style="background: #f0f9ff; padding: 1rem; border-radius: 0.5rem; margin-top: 1rem;">
+                        <h4>نتایج تست:</h4>
+                        <p><strong>وضعیت اتصال:</strong> موفق</p>
+                        <p><strong>کاربر فعلی:</strong> ${user ? user.email : 'هیچ کاربری وارد نشده'}</p>
+                        <p><strong>خطای Auth:</strong> ${authError ? authError.message : 'هیچ خطایی'}</p>
+                    </div>
+                `;
+
+            } catch (error) {
+                connectionStatus.textContent = 'خطا در اتصال!';
+                connectionStatus.style.color = 'red';
+                
+                testResults.innerHTML = `
+                    <div style="background: #fef2f2; padding: 1rem; border-radius: 0.5rem; margin-top: 1rem;">
+                        <h4>خطا:</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function testSignUp() {
+            testResults.innerHTML = '<div class="loading-text">در حال تست ثبت‌نام...</div>';
+
+            try {
+                const { data, error } = await supabase.auth.signUp({
+                    email: 'test@example.com',
+                    password: '12345678',
+                    options: {
+                        data: {
+                            phone: '09123456789',
+                            username: 'testuser',
+                        },
+                    },
+                });
+
+                if (error) {
+                    testResults.innerHTML = `
+                        <div style="background: #fef2f2; padding: 1rem; border-radius: 0.5rem; margin-top: 1rem;">
+                            <h4>خطا در ثبت‌نام:</h4>
+                            <p>${error.message}</p>
+                        </div>
+                    `;
+                } else {
+                    testResults.innerHTML = `
+                        <div style="background: #f0fdf4; padding: 1rem; border-radius: 0.5rem; margin-top: 1rem;">
+                            <h4>ثبت‌نام موفق:</h4>
+                            <p>کاربر ایجاد شد: ${data.user?.email}</p>
+                            <p>تایید شده: ${data.user?.email_confirmed_at ? 'بله' : 'خیر'}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                testResults.innerHTML = `
+                    <div style="background: #fef2f2; padding: 1rem; border-radius: 0.5rem; margin-top: 1rem;">
+                        <h4>خطا:</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function testSignIn() {
+            testResults.innerHTML = '<div class="loading-text">در حال تست ورود...</div>';
+
+            try {
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email: 'test@example.com',
+                    password: '12345678',
+                });
+
+                if (error) {
+                    testResults.innerHTML = `
+                        <div style="background: #fef2f2; padding: 1rem; border-radius: 0.5rem; margin-top: 1rem;">
+                            <h4>خطا در ورود:</h4>
+                            <p>${error.message}</p>
+                        </div>
+                    `;
+                } else {
+                    testResults.innerHTML = `
+                        <div style="background: #f0fdf4; padding: 1rem; border-radius: 0.5rem; margin-top: 1rem;">
+                            <h4>ورود موفق:</h4>
+                            <p>کاربر وارد شد: ${data.user?.email}</p>
+                            <p>شماره موبایل: ${data.user?.user_metadata?.phone || 'تعریف نشده'}</p>
+                            <p>نام کاربری: ${data.user?.user_metadata?.username || 'تعریف نشده'}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                testResults.innerHTML = `
+                    <div style="background: #fef2f2; padding: 1rem; border-radius: 0.5rem; margin-top: 1rem;">
+                        <h4>خطا:</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Auto test connection on page load
+        window.addEventListener('load', testConnection);
+    </script>
+</body>
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>گالری - کانون تبلیغاتی حنان</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = { theme: { extend: { colors: { bg: '#0d0d0d' } } } }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+      body { font-family: Vazirmatn, Arial, sans-serif; }
+      .item-overlay { background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,.55) 100%); }
+      .zoom-hover { transition: transform .4s ease, filter .3s ease; }
+      .zoom-hover:hover { transform: scale(1.03); }
+      .lightbox-enter { animation: fade .2s ease; }
+      @keyframes fade { from{opacity:0} to{opacity:1} }
+    </style>
+</head>
+<body class="bg-bg text-white">
+  <header class="sticky top-0 z-20 bg-bg/90 backdrop-blur border-b border-white/10">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+      <a href="index.html" class="text-xl font-extrabold">کانون تبلیغاتی حنان</a>
+      <nav class="flex gap-2">
+        <a href="portfolio.html" class="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/15">نمونه‌کارها</a>
+        <a href="admin-portfolio.html" class="px-4 py-2 rounded-xl bg-emerald-500 text-black hover:bg-emerald-400">پنل ادمین</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 py-8 space-y-10">
+    <div class="mb-2">
+      <h1 class="text-2xl md:text-3xl font-extrabold">گالری تصاویر و ویدیو</h1>
+      <p class="text-white/70 mt-2">نمایش مجموعه‌ای از پروژه‌ها با استایل مدرن و مینیمال.</p>
+    </div>
+
+    <section>
+      <h2 class="text-xl font-bold mb-3">نمونه‌کارها (عکس)</h2>
+      <div id="gridPhotos" class="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"></div>
+    </section>
+
+    <section>
+      <h2 class="text-xl font-bold mb-3">تیزرها (ویدیو)</h2>
+      <div id="gridTeasers" class="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"></div>
+    </section>
+
+    <section>
+      <h2 class="text-xl font-bold mb-3">لوگوی مشتریان</h2>
+      <div id="gridLogos" class="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"></div>
+    </section>
+  </main>
+
+  <!-- Lightbox / Video Modal -->
+  <div id="viewer" class="fixed inset-0 bg-black/90 hidden items-center justify-center p-4 lightbox-enter">
+    <button id="closeViewer" class="absolute top-4 left-4 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20">بستن</button>
+    <div id="viewerBox" class="max-w-5xl w-full"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const supabaseUrl = "https://gqalshbyurbfbfxfcpas.supabase.co";
+    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxYWxzaGJ5dXJiZmJmeGZjcGFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc3ODQyNjAsImV4cCI6MjA3MzM2MDI2MH0.1NZatlMNKMS6eqSph2aS7-MRsKJHZTHLGOF3BGTpGxE";
+    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+    const gridPhotos = document.getElementById('gridPhotos');
+    const gridTeasers = document.getElementById('gridTeasers');
+    const gridLogos = document.getElementById('gridLogos');
+    const viewer = document.getElementById('viewer');
+    const viewerBox = document.getElementById('viewerBox');
+    const closeViewer = document.getElementById('closeViewer');
+
+    function openImage(url){
+      viewerBox.innerHTML = `<img src="${url}" class="w-full max-h-[85vh] object-contain rounded-xl shadow-lg" />`;
+      viewer.classList.remove('hidden'); viewer.classList.add('flex');
+    }
+    function openVideo(url){
+      viewerBox.innerHTML = `<video src="${url}" controls autoplay class="w-full max-h-[85vh] rounded-xl shadow-lg"></video>`;
+      viewer.classList.remove('hidden'); viewer.classList.add('flex');
+    }
+    closeViewer.onclick = () => { viewer.classList.add('hidden'); viewer.classList.remove('flex'); viewerBox.innerHTML=''; };
+    viewer.addEventListener('click', (e)=>{ if(e.target===viewer) closeViewer.onclick(); });
+
+    (async function load(){
+      async function fill(folder, grid, type){
+        grid.innerHTML = `<div class='col-span-full flex items-center justify-center gap-2 text-white/70'><svg width='28' height='28' viewBox='0 0 24 24'><path fill='currentColor' d='M12 2v2a8 8 0 1 1-8 8H2C2 6.48 6.48 2 12 2Z'><animateTransform attributeName='transform' type='rotate' from='0 12 12' to='360 12 12' dur='1s' repeatCount='indefinite'/></path></svg> در حال بارگذاری...</div>`;
+        const { data, error } = await supabase.storage.from('portfolio').list(folder, { limit: 120, sortBy: { column: 'created_at', order: 'desc' } });
+        if(error){ grid.innerHTML = `<div class='col-span-full text-center text-red-400'>خطا در بارگذاری</div>`; return; }
+        if(!data?.length){ grid.innerHTML = `<div class='col-span-full text-center text-white/60'>آیتمی موجود نیست.</div>`; return; }
+        grid.innerHTML='';
+        for(const item of data){
+          const path = `${folder}/${item.name}`.replace(/^\//,'');
+          const isVideo = /\.(mp4|mov|webm|m4v)$/i.test(path);
+          const { data: pub } = supabase.storage.from('portfolio').getPublicUrl(path);
+          const url = pub?.publicUrl;
+          const card = document.createElement('button');
+          card.className = 'group relative overflow-hidden rounded-xl bg-white/5 ring-1 ring-white/10 focus:outline-none';
+          const isLogo = type==='logo';
+          card.innerHTML = `
+            ${isVideo ? `<div class='absolute inset-0 item-overlay opacity-0 group-hover:opacity-100 transition-opacity'></div>` : ''}
+            ${isVideo ? `<div class='absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity'><svg width='56' height='56' viewBox='0 0 24 24' class='text-white/90'><path fill='currentColor' d='M8 5v14l11-7z'/></svg></div>` : ''}
+            ${isVideo ? `<video src='${url}#t=0.1' muted playsinline class='w-full h-40 md:h-44 object-cover zoom-hover' onmouseenter='this.play()' onmouseleave='this.pause()'></video>`
+                       : `<img src='${url}' alt='item' class='w-full ${isLogo? 'h-28 md:h-32 object-contain p-4 bg-white/5' : 'h-40 md:h-44 object-cover'} zoom-hover'/>`}
+          `;
+          card.addEventListener('click', ()=> isVideo ? openVideo(url) : openImage(url));
+          grid.appendChild(card);
+        }
+      }
+      await fill('photos', gridPhotos, 'photo');
+      await fill('teasers', gridTeasers, 'teaser');
+      await fill('logos', gridLogos, 'logo');
+    })();
+  </script>
+</body>
+</html>

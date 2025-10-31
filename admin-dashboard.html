@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>داشبورد ادمین - کانون تبلیغاتی حنان</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <div class="dashboard">
+        <div class="dashboard-container">
+            <div class="logo-container" style="text-align: center; margin-bottom: 2rem;">
+                <img src="./public/hananlogo.jpg" alt="لوگوی کانون تبلیغاتی حنان" onerror="this.onerror=null;this.src='public/hannan-logo.svg';" class="logo-image" style="width: 100px; height: 100px;">
+            </div>
+            <h1 class="dashboard-title">داشبورد ادمین</h1>
+            
+            <div class="dashboard-stats" style="display: flex; justify-content: center; align-items: center; margin-bottom: 2rem; gap: 2rem;">
+                <div style="background: #1e3a8a; color: #fff; border-radius: 1rem; padding: 2rem 3rem; box-shadow: 0 8px 32px 0 rgba(44, 62, 80, 0.18); display: flex; flex-direction: column; align-items: center;">
+                    <span style="font-size: 3rem; font-weight: bold;"> <span id="totalUsers">-</span> </span>
+                    <span style="font-size: 1.2rem; margin-top: 0.5rem;">تعداد کل کاربران</span>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem; color: var(--primary);">لیست کاربران</h2>
+                
+                <div id="loadingMessage" class="loading-text">در حال بارگذاری...</div>
+                <div id="errorMessage" class="error-message" style="display: none;"></div>
+                
+                <div id="usersTable" style="display: none;">
+                    <table class="users-table">
+                        <thead>
+                            <tr>
+                                <th>نام کاربری</th>
+                                <th>شماره موبایل</th>
+                                <th>ایمیل</th>
+                                <th>وضعیت</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Supabase configuration
+        const supabaseUrl = "https://gqalshbyurbfbfxfcpas.supabase.co";
+        const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxYWxzaGJ5dXJiZmJmeGZjcGFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc3ODQyNjAsImV4cCI6MjA3MzM2MDI2MH0.1NZatlMNKMS6eqSph2aS7-MRsKJHZTHLGOF3BGTpGxE";
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        // DOM elements
+        const loadingMessage = document.getElementById('loadingMessage');
+        const errorMessage = document.getElementById('errorMessage');
+        const usersTable = document.getElementById('usersTable');
+        const usersTableBody = document.getElementById('usersTableBody');
+        const totalUsersElement = document.getElementById('totalUsers');
+        const activeUsersElement = document.getElementById('activeUsers');
+
+        // Fetch users on page load
+        document.addEventListener('DOMContentLoaded', async () => {
+            await fetchUsers();
+        });
+
+        async function fetchUsers() {
+            loadingMessage.style.display = 'block';
+            errorMessage.style.display = 'none';
+            usersTable.style.display = 'none';
+
+            try {
+                // Note: This requires admin privileges and proper RLS policies
+                // For demo purposes, we'll simulate the data structure
+                const { data, error } = await supabase.auth.admin.listUsers();
+                
+                if (error) {
+                    throw new Error('خطا در دریافت کاربران: ' + error.message);
+                }
+
+                const users = data.users || [];
+                displayUsers(users);
+                
+            } catch (error) {
+                console.error('Error fetching users:', error);
+                showError('خطا در دریافت کاربران: ' + error.message);
+            }
+        }
+
+        function displayUsers(users) {
+            loadingMessage.style.display = 'none';
+            
+            if (users.length === 0) {
+                showError('هیچ کاربری یافت نشد.');
+                return;
+            }
+
+            // Update stats
+            const total = users.length;
+            totalUsersElement.textContent = total;
+
+            // Clear table body
+            usersTableBody.innerHTML = '';
+
+            // Populate table
+            users.forEach(user => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${user.user_metadata?.username || '-'}</td>
+                    <td>${user.user_metadata?.phone || '-'}</td>
+                    <td>${user.email}</td>
+                    <td>
+                        <span class="${user.confirmed_at ? 'status-active' : 'status-inactive'}">
+                            ${user.confirmed_at ? 'فعال' : 'غیرفعال'}
+                        </span>
+                    </td>
+                `;
+                usersTableBody.appendChild(row);
+            });
+
+            usersTable.style.display = 'block';
+        }
+
+        function showError(message) {
+            loadingMessage.style.display = 'none';
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+        }
+
+        // Refresh button functionality (optional)
+        function refreshUsers() {
+            fetchUsers();
+        }
+
+        // Add refresh button to the dashboard
+        const refreshButton = document.createElement('button');
+        refreshButton.textContent = 'بروزرسانی';
+        refreshButton.className = 'btn-primary';
+        refreshButton.style.marginBottom = '1rem';
+        refreshButton.onclick = refreshUsers;
+        
+        const dashboardTitle = document.querySelector('.dashboard-title');
+        dashboardTitle.parentNode.insertBefore(refreshButton, dashboardTitle.nextSibling);
+    </script>
+</body>
+</html>

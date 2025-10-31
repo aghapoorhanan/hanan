@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>پنل ادمین - HANAN</title>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>body{font-family:Vazirmatn,sans-serif;}</style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+  <header class="bg-white/90 shadow sticky top-0 z-30 py-4 mb-8">
+    <div class="max-w-5xl mx-auto flex justify-between items-center px-4">
+      <div class="font-extrabold text-lg text-blue-600">HANAN | Admin Panel</div>
+      <a href="index.html" class="text-base bg-blue-600 rounded px-4 py-1 text-white font-bold">خروج</a>
+    </div>
+  </header>
+  <main class="max-w-4xl mx-auto p-4">
+    <h1 class="text-xl font-bold mb-8 text-blue-800">مدیریت کاربران سایت</h1>
+    <div class="bg-white rounded-xl shadow p-7 ">
+      <div class="flex justify-between items-center mb-6">
+        <span class="font-bold">تعداد کل کاربران:</span>
+        <span id="usersCount" class="text-blue-700 text-lg">0</span>
+      </div>
+      <table class="w-full text-center">
+        <thead class="bg-blue-100">
+          <tr><th>نام</th><th>ایمیل</th><th>شماره تماس</th><th>اعتبار (تومان)</th><th>کنترل اعتبار</th></tr>
+        </thead>
+        <tbody id="usersList">
+        </tbody>
+      </table>
+      <div id="noUsers" class="text-center text-gray-400 my-10 hidden">هیچ کاربری ثبت نشده است.</div>
+    </div>
+  </main>
+  <footer class="border-t bg-white/70 py-5 mt-10 text-center text-gray-500 font-medium text-sm">&copy; 2025 HANAN Admin</footer>
+  <script>
+    // دریافت کاربران از localStorage | نمایش لیست و ابزار اعتبار
+    function renderUsers() {
+      let users = JSON.parse(localStorage.getItem('users')||'[]');
+      const usersList = document.getElementById('usersList');
+      usersList.innerHTML = '';
+      document.getElementById('usersCount').innerText = users.length;
+      document.getElementById('noUsers').classList.toggle('hidden', users.length!==0);
+      users.forEach((user, idx) => {
+        let tr = document.createElement('tr');
+        tr.innerHTML = `
+        <td>${user.name||'-'}</td>
+        <td>${user.email||'-'}</td>
+        <td class="font-mono">${user.phone||'-'}</td>
+        <td><span id="uc${idx}">${user.credit||0}</span></td>
+        <td>
+          <button class="bg-green-400 hover:bg-green-500 text-white rounded px-2" onclick="plus(${idx})">+</button>
+          <button class="bg-red-400 hover:bg-red-500 text-white rounded px-2" onclick="minus(${idx})">-</button>
+        </td>`;
+        usersList.appendChild(tr);
+      });
+    }
+    function plus(i){
+      let users = JSON.parse(localStorage.getItem('users')||'[]');
+      users[i].credit = (users[i].credit||0) + 10000;
+      localStorage.setItem('users', JSON.stringify(users));
+      renderUsers();
+    }
+    function minus(i){
+      let users = JSON.parse(localStorage.getItem('users')||'[]');
+      users[i].credit = Math.max(0, (users[i].credit||0) - 10000);
+      localStorage.setItem('users', JSON.stringify(users));
+      renderUsers();
+    }
+    window.plus = plus; window.minus = minus;
+    renderUsers();
+  </script>
+</body>
+</html>

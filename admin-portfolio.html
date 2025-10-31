@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مدیریت نمونه‌کارها - ادمین</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <div class="form-container">
+        <div class="form-card" style="max-width: 40rem;">
+            <h2 class="form-title">مدیریت نمونه‌کارها</h2>
+            <div id="authGate">
+                <p>ورود ادمین (صرفاً برای جلوگیری ساده):</p>
+                <input id="email" class="form-input" type="email" placeholder="ایمیل ادمین">
+                <input id="password" class="form-input" type="password" placeholder="رمز عبور">
+                <button id="loginBtn" class="form-submit">ورود</button>
+                <div id="authError" class="error-message" style="display:none;"></div>
+            </div>
+
+            <div id="uploader" style="display:none;">
+                <div id="adminNav" class="card" style="margin-bottom:1rem; display:none;">
+                    <div style="display:flex; gap:.5rem; flex-wrap:wrap; align-items:center;">
+                        <button id="filterAll" class="btn-secondary">همه آیتم‌ها</button>
+                        <button id="filterImages" class="btn-secondary">فقط تصاویر</button>
+                        <button id="filterVideos" class="btn-secondary">فقط ویدیوها</button>
+                        <button id="filterPhotos" class="btn-secondary">عکس‌ها</button>
+                        <button id="filterTeasers" class="btn-secondary">تیزرها</button>
+                        <button id="filterLogos" class="btn-secondary">لوگوها</button>
+                        <a href="gallery.html" class="btn-primary">مشاهده گالری</a>
+                        <a href="admin-dashboard.html" class="btn-primary">مدیریت کاربران</a>
+                        <a href="index.html" class="btn-secondary">صفحه اصلی</a>
+                        <button id="signOut" class="btn-secondary" style="margin-right:auto;">خروج ادمین</button>
+                    </div>
+                </div>
+                <p>فایل تصویر یا ویدیو را انتخاب کنید (jpg, png, mp4, webm):</p>
+                <select id="category" class="form-input" style="margin-bottom:.5rem;">
+                  <option value="photos">عکس (نمونه‌کار)</option>
+                  <option value="teasers">تیزر (ویدیو)</option>
+                  <option value="logos">لوگوی مشتری</option>
+                </select>
+                <input id="fileInput" class="form-input" type="file" accept="image/*,video/*">
+                <button id="uploadBtn" class="btn-primary" style="margin-top: .75rem; display:inline-flex; align-items:center; gap:.5rem;">
+                  <span id="uploadText">آپلود</span>
+                  <svg id="uploadSpin" style="display:none;" width="16" height="16" viewBox="0 0 24 24"><path fill="#0e2a5f" d="M12 2v2a8 8 0 1 1-8 8H2C2 6.48 6.48 2 12 2Z"><animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="1s" repeatCount="indefinite"/></path></svg>
+                </button>
+                <div id="status" class="success-message" style="display:none;"></div>
+                <div id="error" class="error-message" style="display:none;"></div>
+                <div class="card" style="margin-top:1rem;">
+                    <h3 style="margin-bottom:.5rem;">آخرین موارد آپلود شده</h3>
+                    <div id="recent" class="gallery-grid"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const supabaseUrl = "https://gqalshbyurbfbfxfcpas.supabase.co";
+        const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxYWxzaGJ5dXJiZmJmeGZjcGFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc3ODQyNjAsImV4cCI6MjA3MzM2MDI2MH0.1NZatlMNKMS6eqSph2aS7-MRsKJHZTHLGOF3BGTpGxE";
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        const ADMIN_EMAIL = 'hananaghapoor@gmail.com';
+        const ADMIN_PASS = '123456789';
+
+        const authGate = document.getElementById('authGate');
+        const uploader = document.getElementById('uploader');
+        const loginBtn = document.getElementById('loginBtn');
+        const authError = document.getElementById('authError');
+        const fileInput = document.getElementById('fileInput');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const status = document.getElementById('status');
+        const errorBox = document.getElementById('error');
+        const recent = document.getElementById('recent');
+
+        loginBtn.onclick = () => {
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+            if(email === ADMIN_EMAIL && password === ADMIN_PASS){
+                authGate.style.display = 'none';
+                uploader.style.display = 'block';
+                document.getElementById('adminNav').style.display = 'block';
+                loadRecent();
+            } else {
+                authError.textContent = 'اطلاعات ادمین اشتباه است.';
+                authError.style.display = 'block';
+            }
+        };
+
+        document.getElementById('signOut').onclick = () => {
+            uploader.style.display = 'none';
+            document.getElementById('adminNav').style.display = 'none';
+            authGate.style.display = 'block';
+        };
+
+        let currentFilter = 'all';
+        document.getElementById('filterAll').onclick = ()=>{ currentFilter='all'; loadRecent(); };
+        document.getElementById('filterImages').onclick = ()=>{ currentFilter='images'; loadRecent(); };
+        document.getElementById('filterVideos').onclick = ()=>{ currentFilter='videos'; loadRecent(); };
+        document.getElementById('filterPhotos').onclick = ()=>{ currentFilter='photos'; loadRecent(); };
+        document.getElementById('filterTeasers').onclick = ()=>{ currentFilter='teasers'; loadRecent(); };
+        document.getElementById('filterLogos').onclick = ()=>{ currentFilter='logos'; loadRecent(); };
+
+        async function loadRecent(){
+            recent.innerHTML = '<div class="loading-text" style="grid-column:1/-1;text-align:center;"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2v2a8 8 0 1 1-8 8H2C2 6.48 6.48 2 12 2Z"><animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="1s" repeatCount="indefinite"/></path></svg> در حال بارگذاری...</div>';
+            const { data, error } = await supabase.storage.from('portfolio').list('', { limit: 200, sortBy: { column: 'created_at', order: 'desc' } });
+            if(error){ recent.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#b91c1c;">خطا در بارگذاری</div>'; return; }
+            recent.innerHTML = '';
+            data.forEach(item => {
+                const isVideo = /\.(mp4|mov|webm|m4v)$/i.test(item.name);
+                const inPhotos = item.name.startsWith('photos/');
+                const inTeasers = item.name.startsWith('teasers/');
+                const inLogos = item.name.startsWith('logos/');
+                if(currentFilter==='images' && isVideo) return;
+                if(currentFilter==='videos' && !isVideo) return;
+                if(currentFilter==='photos' && !inPhotos) return;
+                if(currentFilter==='teasers' && !inTeasers) return;
+                if(currentFilter==='logos' && !inLogos) return;
+                const { data: pub } = supabase.storage.from('portfolio').getPublicUrl(item.name);
+                const url = pub?.publicUrl;
+                const el = document.createElement('div'); el.className='gallery-item card'; el.style.padding='0';
+                el.innerHTML = isVideo ? `<video src="${url}#t=0.1" controls muted style="width:100%;height:100%;display:block;border-radius:.75rem;"></video>`
+                                       : `<img src="${url}" style="width:100%;height:100%;object-fit:cover;border-radius:.75rem;">`;
+                recent.appendChild(el);
+            });
+        }
+
+        uploadBtn.onclick = async () => {
+            status.style.display = 'none'; errorBox.style.display = 'none';
+            const file = fileInput.files?.[0];
+            const category = document.getElementById('category').value;
+            if(!file){ errorBox.textContent='ابتدا فایل را انتخاب کنید.'; errorBox.style.display='block'; return; }
+            try{
+                uploadBtn.disabled = true; document.getElementById('uploadSpin').style.display='inline'; document.getElementById('uploadText').textContent='در حال آپلود...';
+                const ext = (file.name.split('.').pop()||'').toLowerCase();
+                const allowed = ['jpg','jpeg','png','webp','mp4','mov','webm','m4v'];
+                if(!allowed.includes(ext)){ throw new Error('فرمت فایل مجاز نیست.'); }
+                const filename = `${category}/${Date.now()}.${ext}`;
+                const { error } = await supabase.storage.from('portfolio').upload(filename, file, { upsert: false, cacheControl: '3600' });
+                if(error) throw error;
+                status.textContent = 'فایل با موفقیت آپلود شد.'; status.style.display = 'block';
+                fileInput.value='';
+                await loadRecent();
+            }catch(e){
+                errorBox.textContent = 'خطا: ' + (e?.message||e); errorBox.style.display='block';
+            }finally{
+                uploadBtn.disabled = false; document.getElementById('uploadSpin').style.display='none'; document.getElementById('uploadText').textContent='آپلود';
+            }
+        };
+    </script>
+</body>
+</html>

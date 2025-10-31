@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تست لوگو - کانون تبلیغاتی حنان</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="form-container">
+        <div class="form-card">
+            <h2 class="form-title">تست نمایش لوگو</h2>
+            
+            <div style="background: #f0fdf4; padding: 1rem; border-radius: 0.5rem; margin-bottom: 2rem;">
+                <h3>لوگوی فعلی:</h3>
+                <div style="text-align: center; margin: 2rem 0;">
+                    <img src="./public/hananlogo.jpg" alt="لوگوی کانون تبلیغاتی حنان" onerror="this.onerror=null;this.src='public/hannan-logo.svg';" style="max-width: 300px; max-height: 300px; border: 2px solid #3b82f6; border-radius: 1rem; padding: 1rem; background: white;">
+                </div>
+            </div>
+
+            <div style="background: #dbeafe; padding: 1rem; border-radius: 0.5rem; margin-bottom: 2rem;">
+                <h3>اندازه‌های مختلف:</h3>
+                <div style="display: flex; justify-content: space-around; align-items: center; margin: 1rem 0;">
+                    <div style="text-align: center;">
+                        <img src="./public/hananlogo.jpg" alt="لوگو کوچک" onerror="this.onerror=null;this.src='public/hannan-logo.svg';" style="width: 80px; height: 80px; border: 1px solid #ccc; border-radius: 0.5rem;">
+                        <p style="font-size: 0.75rem; margin-top: 0.5rem;">80x80</p>
+                    </div>
+                    <div style="text-align: center;">
+                        <img src="./public/hananlogo.jpg" alt="لوگو متوسط" onerror="this.onerror=null;this.src='public/hannan-logo.svg';" style="width: 120px; height: 120px; border: 1px solid #ccc; border-radius: 0.5rem;">
+                        <p style="font-size: 0.75rem; margin-top: 0.5rem;">120x120</p>
+                    </div>
+                    <div style="text-align: center;">
+                        <img src="./public/hananlogo.jpg" alt="لوگو بزرگ" onerror="this.onerror=null;this.src='public/hannan-logo.svg';" style="width: 180px; height: 180px; border: 1px solid #ccc; border-radius: 0.5rem;">
+                        <p style="font-size: 0.75rem; margin-top: 0.5rem;">180x180</p>
+                    </div>
+                </div>
+            </div>
+
+            <div style="background: #fef3c7; padding: 1rem; border-radius: 0.5rem; margin-bottom: 2rem;">
+                <h3>وضعیت فایل:</h3>
+                <p id="fileStatus">در حال بررسی...</p>
+            </div>
+
+            <div style="text-align: center;">
+                <a href="index.html" class="btn-primary">بازگشت به صفحه اصلی</a>
+                <button onclick="checkLogo()" class="btn-secondary" style="margin-right: 1rem;">بررسی مجدد</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function checkLogo() {
+            const img = new Image();
+            const statusElement = document.getElementById('fileStatus');
+            
+            img.onload = function() {
+                statusElement.innerHTML = `
+                    <strong style="color: green;">✅ لوگو با موفقیت بارگذاری شد!</strong><br>
+                    اندازه اصلی: ${img.naturalWidth}x${img.naturalHeight} پیکسل<br>
+                    حجم فایل: ${(img.src.length / 1024).toFixed(2)} KB (تقریبی)
+                `;
+            };
+            
+            img.onerror = function() {
+                statusElement.innerHTML = `
+                    <strong style="color: red;">❌ خطا در بارگذاری لوگو!</strong><br>
+                    فایل hannan-logo.png در پوشه public یافت نشد.
+                `;
+            };
+            
+            img.src = './public/hannan-logo.png?' + new Date().getTime();
+        }
+
+        // Check logo on page load
+        window.addEventListener('load', checkLogo);
+    </script>
+</body>
+</html>

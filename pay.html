@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>پرداخت آنلاین - HANAN</title>
+  <meta name="description" content="پرداخت امن و آنلاین برای خرید پکیج‌ها یا شارژ کیف پول در HANAN.">
+  <meta name="keywords" content="پرداخت تبلیغات, درگاه پرداخت, خرید آنلاین, آژانس تبلیغاتی HANAN">
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>body{font-family:Vazirmatn,sans-serif}</style>
+</head>
+<body class="bg-gradient-to-tr from-blue-100 to-stone-50 min-h-screen text-gray-800">
+  <header class="bg-white/80 shadow sticky top-0 z-30 py-4">
+    <div class="max-w-6xl mx-auto flex justify-between items-center px-4">
+      <div class="font-extrabold text-lg text-blue-600">HANAN</div>
+      <nav class="flex gap-7 text-base">
+        <a href="index.html">خانه</a>
+        <a href="packages.html">پکیج‌ها</a>
+        <a href="wallet.html">شارژ کیف پول</a>
+      </nav>
+    </div>
+  </header>
+  <main class="mt-16 max-w-xl mx-auto px-4">
+    <section class="bg-white/90 shadow-xl rounded-xl p-8">
+      <h1 class="text-2xl font-extrabold text-blue-700 mb-6 text-center">انتخاب درگاه پرداخت</h1>
+      <div id="orderInfo" class="text-center text-gray-700 mb-6"></div>
+      <div class="space-y-4">
+        <button id="btn-zp" class="w-full border border-blue-200 hover:border-blue-400 rounded-lg py-3 font-bold">زرین‌پال (زرین‌لینک)</button>
+        <button id="btn-idpay" class="w-full border border-blue-200 hover:border-blue-400 rounded-lg py-3 font-bold">IDPay (لینک پرداخت)</button>
+        <button id="btn-demo" class="w-full bg-gradient-to-l from-orange-400 to-yellow-400 px-4 py-3 rounded text-white font-extrabold text-lg shadow">پرداخت نمایشی (تست)</button>
+      </div>
+      <p class="text-xs text-gray-500 mt-5">نکته: برای پرداخت واقعی، کافی است لینک درگاه‌ها را در کد تنظیم کنید؛ نیازی به بک‌اند نیست (حالت لینک‌محور).</p>
+      <div class="thanks-message text-center mt-8 hidden" id="thanks-message">
+        <h2 class="text-2xl text-green-600 font-bold mb-2">پرداخت با موفقیت انجام شد!</h2>
+        <p class="font-semibold">با تشکر، تیم HANAN به زودی با شما تماس خواهد گرفت.<br><a href="index.html" class="text-blue-600 underline mt-2 inline-block">بازگشت به خانه</a></p>
+      </div>
+    </section>
+  </main>
+  <footer class="border-t bg-white/70 py-5 mt-10 text-center text-gray-500 font-medium text-sm">
+    &copy; 2025 HANAN Agency
+  </footer>
+  <script>
+    // پیکربندی لینک‌های درگاه (اینجا لینک‌های واقعی خود را قرار دهید)
+    const GATEWAYS = {
+      zarinpalLink: '',   // مثال: 'https://zarinp.al/your-zarinlink' (زرین‌لینک)
+      idpayLink: ''       // مثال: 'https://idpay.ir/your-idpay-link' (لینک پرداخت آماده)
+    };
+
+    const params = new URLSearchParams(window.location.search);
+    const amount = parseInt(params.get('amount')||'0');
+    const pkg = params.get('pkg')||'';
+    const isWallet = params.get('for')==='wallet';
+
+    const orderInfo = document.getElementById('orderInfo');
+    orderInfo.innerHTML = amount>0
+      ? (isWallet? `شارژ کیف پول: <b>${amount.toLocaleString()}</b> تومان` : `پرداخت سفارش ${pkg || 'سرویس'}: <b>${amount.toLocaleString()}</b> تومان`)
+      : 'مبلغی تنظیم نشده است. لطفاً از صفحات پکیج‌ها یا کیف پول وارد شوید.';
+
+    function openLink(base){
+      if(!base){
+        alert('لینک این درگاه هنوز تنظیم نشده است.');
+        return;
+      }
+      // اگر درگاه لینک‌محور امکان افزودن مبلغ در query دارد، اضافه کنید
+      // نمونه عمومی: ?amount= رقم
+      const url = base.includes('?') ? `${base}&amount=${amount}` : `${base}?amount=${amount}`;
+      window.location.href = url;
+    }
+
+    document.getElementById('btn-zp').onclick = ()=> openLink(GATEWAYS.zarinpalLink);
+    document.getElementById('btn-idpay').onclick = ()=> openLink(GATEWAYS.idpayLink);
+
+    document.getElementById('btn-demo').onclick = ()=>{
+      // پرداخت نمایشی
+      document.querySelector('.space-y-4').classList.add('hidden');
+      document.getElementById('thanks-message').classList.remove('hidden');
+      // در صورت شارژ کیف پول، موجودی لوکال را افزایش دهیم
+      if(isWallet && amount>0){
+        let bal = parseInt(localStorage.getItem('walletAmount')||'0');
+        bal += amount;
+        localStorage.setItem('walletAmount', bal.toString());
+      }
+    };
+  </script>
+</body>
+</html>

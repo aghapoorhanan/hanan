@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>راه‌حل ساده برای لوگو - کانون تبلیغاتی حنان</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="form-container">
+        <div class="form-card">
+            <h2 class="form-title">راه‌حل ساده برای لوگو</h2>
+            
+            <div style="background: #f0fdf4; padding: 1rem; border-radius: 0.5rem; margin-bottom: 2rem;">
+                <h3>مراحل ساده:</h3>
+                <ol style="margin: 1rem 0; padding-right: 2rem;">
+                    <li>عکس لوگوی خود را کپی کنید (Ctrl+C)</li>
+                    <li>به پوشه <code>public</code> بروید</li>
+                    <li>عکس را paste کنید (Ctrl+V)</li>
+                    <li>نام فایل را به <code>hannan-logo.png</code> تغییر دهید</li>
+                </ol>
+            </div>
+
+            <div style="background: #dbeafe; padding: 1rem; border-radius: 0.5rem; margin-bottom: 2rem;">
+                <h3>پیش‌نمایش لوگو:</h3>
+                <div id="logoPreview" style="text-align: center; margin: 1rem 0;">
+                    <img id="previewImage" src="./public/hananlogo.jpg" alt="لوگوی کانون تبلیغاتی حنان" onerror="this.onerror=null;this.src='public/hannan-logo.svg';" style="max-width: 200px; max-height: 200px; border: 2px dashed #3b82f6; border-radius: 0.5rem; padding: 1rem;">
+                </div>
+                <p style="text-align: center; color: #6b7280; font-size: 0.875rem;">
+                    اگر لوگو نمایش داده نمی‌شود، فایل <code>hannan-logo.png</code> را در پوشه <code>public</code> قرار دهید
+                </p>
+            </div>
+
+            <div style="background: #fef3c7; padding: 1rem; border-radius: 0.5rem; margin-bottom: 2rem;">
+                <h3>نکات مهم:</h3>
+                <ul style="margin: 1rem 0; padding-right: 2rem;">
+                    <li>نام فایل باید دقیقاً <code>hannan-logo.png</code> باشد</li>
+                    <li>فایل باید در پوشه <code>public</code> قرار گیرد</li>
+                    <li>فرمت PNG بهتر از JPG است</li>
+                    <li>اندازه مناسب: 300x300 پیکسل</li>
+                </ul>
+            </div>
+
+            <div style="text-align: center;">
+                <a href="index.html" class="btn-primary">بازگشت به صفحه اصلی</a>
+                <button onclick="refreshPreview()" class="btn-secondary" style="margin-right: 1rem;">بروزرسانی پیش‌نمایش</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function refreshPreview() {
+            const previewImage = document.getElementById('previewImage');
+            // Add timestamp to force refresh
+            previewImage.src = './public/hannan-logo.png?' + new Date().getTime();
+        }
+
+        // Auto refresh preview every 5 seconds
+        setInterval(refreshPreview, 5000);
+    </script>
+</body>
+</html>

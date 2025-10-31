@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>راه‌حل مشکل احراز هویت - کانون تبلیغاتی حنان</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="form-container">
+        <div class="form-card">
+            <h2 class="form-title">راه‌حل مشکل احراز هویت</h2>
+            
+            <div style="background: #fef3c7; padding: 1rem; border-radius: 0.5rem; margin-bottom: 2rem;">
+                <h3>مشکلات احتمالی:</h3>
+                <ul style="margin: 1rem 0; padding-right: 2rem;">
+                    <li>کلید Supabase منقضی شده</li>
+                    <li>تنظیمات RLS (Row Level Security) درست نیست</li>
+                    <li>ایمیل تایید نشده</li>
+                    <li>مشکل در تنظیمات پروژه Supabase</li>
+                </ul>
+            </div>
+
+            <div style="background: #f0fdf4; padding: 1rem; border-radius: 0.5rem; margin-bottom: 2rem;">
+                <h3>راه‌حل‌های پیشنهادی:</h3>
+                <ol style="margin: 1rem 0; padding-right: 2rem;">
+                    <li><strong>بررسی تنظیمات Supabase:</strong>
+                        <ul style="margin: 0.5rem 0; padding-right: 1rem;">
+                            <li>وارد پنل Supabase شوید</li>
+                            <li>Authentication > Settings را بررسی کنید</li>
+                            <li>Confirm email را غیرفعال کنید (برای تست)</li>
+                        </ul>
+                    </li>
+                    <li><strong>بررسی کلیدها:</strong>
+                        <ul style="margin: 0.5rem 0; padding-right: 1rem;">
+                            <li>کلید anon public را کپی کنید</li>
+                            <li>URL پروژه را بررسی کنید</li>
+                        </ul>
+                    </li>
+                    <li><strong>تست با فایل test-supabase.html:</strong>
+                        <ul style="margin: 0.5rem 0; padding-right: 1rem;">
+                            <li>فایل test-supabase.html را باز کنید</li>
+                            <li>تست‌های مختلف را انجام دهید</li>
+                        </ul>
+                    </li>
+                </ol>
+            </div>
+
+            <div style="background: #dbeafe; padding: 1rem; border-radius: 0.5rem; margin-bottom: 2rem;">
+                <h3>تنظیمات جدید Supabase:</h3>
+                <p>اگر مشکل ادامه دارد، این تنظیمات را در پنل Supabase انجام دهید:</p>
+                <ol style="margin: 1rem 0; padding-right: 2rem;">
+                    <li>Authentication > Settings > Email Auth > Confirm email: OFF</li>
+                    <li>Authentication > Settings > Email Auth > Enable email confirmations: OFF</li>
+                    <li>Database > Tables > auth.users > RLS: بررسی کنید</li>
+                </ol>
+            </div>
+
+            <div style="text-align: center;">
+                <a href="test-supabase.html" class="btn-primary">تست اتصال Supabase</a>
+                <a href="login.html" class="btn-secondary">صفحه ورود</a>
+                <a href="register.html" class="btn-secondary">صفحه ثبت‌نام</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
